@@ -4,6 +4,7 @@ const colors = document.getElementsByClassName('colors');
 const range = document.getElementById('jsRange');
 const mode = document.getElementById('jsMode');
 const save = document.getElementById('jsSave');
+const rect = document.getElementById('jsShapeRect');
 
 canvas.width = 500;
 canvas.height = 500;
@@ -16,9 +17,18 @@ ctx.lineWidth = 2.5;
 
 let painting = false;
 let filling = false;
+let rectPainting = false;
+let x = 0;
+let y = 0;
+let oldx = 0;
+let oldy = 0;
 
 function stopPainting() {
   painting = false;
+
+  if (rectPainting) {
+    ctx.fillRect(oldx, oldy, x - oldx, y - oldy);
+  }
 }
 
 function startPainting() {
@@ -32,9 +42,16 @@ function onMouseMove(event) {
   if (!painting) {
     ctx.beginPath();
     ctx.moveTo(offsetX, offsetY);
+    oldx = offsetX;
+    oldy = offsetY;
   } else {
-    ctx.lineTo(offsetX, offsetY);
-    ctx.stroke();
+    if (rectPainting) {
+      x = offsetX;
+      y = offsetY;
+    } else {
+      ctx.lineTo(offsetX, offsetY);
+      ctx.stroke();
+    }
   }
 }
 
@@ -77,6 +94,14 @@ function handleSaveClick(event) {
   link.click();
 }
 
+function handleRectClick(event) {
+  if (rectPainting) {
+    rectPainting = false;
+  } else {
+    rectPainting = true;
+  }
+}
+
 if (canvas) {
   canvas.addEventListener('mousemove', onMouseMove);
   canvas.addEventListener('mousedown', startPainting);
@@ -99,4 +124,8 @@ if (mode) {
 
 if (save) {
   save.addEventListener('click', handleSaveClick);
+}
+
+if (rect) {
+  rect.addEventListener('click', handleRectClick);
 }
